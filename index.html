@@ -8,17 +8,28 @@
   </head>
   <body>
     <div id="app">
-      <p v-if="characterList.length === 0">There are no characters</p>
-      <ul v-else-if="characterList.length % 2 === 0">
-        <li v-for="character in characterList">{{ character.name }}</li>
+      <h1>Tantalisingly Titilating</h1>
+      <p>Character List:</p>
+      <ul v-if="characterList">
+        <li v-for="character in characterList">{{ character.name }}
+          <button v-if="showFavouriteButon(character)" @click="favouriteCharacter(character)">Favourite!</button>
+        </li>
       </ul>
+      <p v-else>There are no characters</p>
       <p>
-        <span v-for="(character, index) in characterList"
-          >{{ character.name }}{{ index === characterList.length - 1 ? '' : ', '
-          }}
-        </span>
+      <p>Favourite List:</p>
+      <ul v-if="favouriteCharacterList != 0">
+          <li v-for="character in favouriteCharacterList">{{ character.name }}
+            <button v-if="showFavouriteButon(character) === false" @click="favouriteCharacter(character)">Unfavourite!</button>
+          </li>
+        </ul>
+      <p v-else>There are no favourites!</p>
+      <p>
+        <label for="addCharacter">Add Character: </label>
+        <input type="text"
+        v-model="newCharacterName"
+        @keyup.enter="addCharacter"/>
       </p>
-      <p v-else>There are odd characters!</p>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -27,19 +38,52 @@
         data: () => ({
           characterList: [
             {
-              name: 'Aang'
+              name: 'Juniper Jeffries',
+              favourite: false
             },
             {
-              name: 'Zuko'
+              name: 'Philistine Fusspot',
+              favourite: false
             },
             {
-              name: 'Toph'
+              name: 'Tracey Bodasey',
+              favourite: false
             },
             {
-              name: 'Katara'
+              name: 'Catapita Mescalita',
+              favourite: false
             }
-          ]
-        })
+          ],
+          favouriteCharacterList: [],
+          newCharacterName: ""
+        }),
+        methods: {
+          favouriteCharacter(character) {
+            if (character.favourite) {
+              character.favourite = false
+            }
+            else {
+              character.favourite = true
+            }
+            this.favouriteCharacterList = []
+            this.characterList.forEach(character => {
+              if (character.favourite) {
+                this.favouriteCharacterList.push(character)
+              }
+            })
+          },
+          showFavouriteButon(character) {
+            if (this.favouriteCharacterList.includes(character)) {
+              return false
+            }
+            else {
+              return true
+            }
+          },
+          addCharacter() {
+            this.characterList.push({name: this.newCharacterName, favourite: false})
+          }
+        }
       }).mount('#app')
     </script>
   </body>
