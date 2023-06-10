@@ -8,65 +8,108 @@
   </head>
   <body>
     <div id="app">
-      <p v-if="characterList.length === 0">There are no characters</p>
-      <ul v-else-if="characterList.length % 2 === 0">
-        <li v-for="character in characterList">
-          <p>{{ character.name }}</p>
-          <button @click="favoriteCharacter(character)">⭐ Favorite</button>
+      <h1>Tantalisingly Titilating</h1>
+      <p>Character List:</p>
+      <ul v-if="characterList">
+        <li v-for="character in characterList">{{ character.name }}
+          <button v-if="showFavouriteButon(character)" @click="favouriteCharacter(character)">Favourite!</button>
         </li>
       </ul>
-      <h2>Favorite Characters</h2>
-      <ul v-if="favoriteList.length > 0">
-        <li v-for="character in favoriteList">{{ character }}</li>
-      </ul>
-      <p v-else>No favorite characters yet!</p>
-      <h2>New Character</h2>
-      <pre>{{ newCharacter }}</pre>
-      <label for="character-name">Name</label>
-      <input
-        type="text"
-        v-model="newCharacter.name"
-        @keyup.enter="addNewCharacter"
-      />
+      <p v-else>There are no characters</p>
       <p>
-        <span v-for="(character, index) in characterList"
-          >{{ character.name }}{{ index === characterList.length - 1 ? '' : ', '
-          }}
-        </span>
+      <div v-if="favouriteCharacterList != 0">
+        <p>Favourite List of: {{ ageGroup }}</p>
+        <ul>
+            <li v-for="character in favouriteCharacterList">{{ character.name }}
+              <button v-if="showFavouriteButon(character) === false" @click="favouriteCharacter(character)">Unfavourite!</button>
+            </li>
+          </ul>
+      </div>
+      <p v-else>There are no favourites!</p>
+      <p>
+        <label for="addCharacter">Add Character: </label>
+        <input type="text"
+        v-model="newCharacterName"
+        @keyup.enter="addCharacter"/>
       </p>
-      <p v-else>There are odd characters!</p>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
       Vue.createApp({
         data: () => ({
-          newCharacter: {
-            name: ''
-          },
           characterList: [
             {
-              name: 'Aang'
+              name: 'Juniper Jeffries',
+              height: 183,
+              age: 34,
+              favourite: false
             },
             {
-              name: 'Zuko'
+              name: 'Philistine Fusspot',
+              height: 140,
+              age: 47,
+              favourite: false
             },
             {
-              name: 'Toph'
+              name: 'Tracey Bodasey',
+              height: 160,
+              age: 36,
+              favourite: false
             },
             {
-              name: 'Katara'
+              name: 'Catapita Mescalita',
+              height: 192,
+              age: 41,
+              favourite: false
             }
           ],
-          favoriteList: []
+          favouriteCharacterList: [],
+          averageAge: 0,
+          newCharacterName: ""
         }),
+        computed: {
+          ageGroup() {
+            averageAge = this.getAverage()
+            if (this.averageAge > 40) {
+              return 'Oldies'
+            }
+            else {
+              return 'Young wans'
+            }
+          }
+        },
         methods: {
-          addNewCharacter() {
-            this.characterList.push(this.newCharacter)
-            this.newCharacter = { name: '' }
+          favouriteCharacter(character) {
+            if (character.favourite) {
+              character.favourite = false
+            }
+            else {
+              character.favourite = true
+            }
+            this.favouriteCharacterList = []
+            this.characterList.forEach(character => {
+              if (character.favourite) {
+                this.favouriteCharacterList.push(character)
+              }
+            })
           },
-          favoriteCharacter(character) {
-            this.favoriteList.push(character)
+          showFavouriteButon(character) {
+            if (this.favouriteCharacterList.includes(character)) {
+              return false
+            }
+            else {
+              return true
+            }
+          },
+          addCharacter() {
+            this.characterList.push({name: this.newCharacterName, favourite: false})
+          },
+          getAverage() { 
+            let totalAge = 0
+            this.favouriteCharacterList.forEach(character => {
+            totalAge += character.age})
+            this.averageAge = totalAge / this.favouriteCharacterList.length
           }
         }
       }).mount('#app')
